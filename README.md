@@ -25,6 +25,14 @@ npm run preview
 
 Static output is in `dist/`.
 
+## GitHub Pages deployment
+
+The repository is `hamzaboutaleb/hamzaboutaleb.github.io`, published at `https://hamzaboutaleb.github.io`. The workflow in `.github/workflows/deploy.yml` builds Astro with Node 24 and deploys the generated site whenever changes are pushed to `main`. It can also be started manually from the Actions tab.
+
+In the repository’s **Settings → Pages → Build and deployment**, set **Source** to **GitHub Actions**. The default branch-based Jekyll build does not build the Astro source. Commit and push the deployment workflow and `astro.config.mjs` changes to trigger the first Astro deployment.
+
+No `base` prefix is needed for this repository name. `SITE_URL` can override the site URL when moving to a custom domain.
+
 The homepage uses a four-column destination row on desktop and a 2×2 grid on mobile, with a single-column fallback on very narrow screens. In browsers supporting native cross-document view transitions, the navigation moves from its homepage position to a compact bar at the top of the destination page over 480ms, then content fades in over 240ms. Matching transition names preserve the navigation labels through the movement. The name at the top links home. Other browsers navigate normally, and reduced-motion preferences disable the transition.
 
 Homepage keyboard shortcuts: `1` Projects, `2` Blog, `3` About, `4` Contact. Shortcuts work without visible hints or controls and ignore typing fields, interactive form controls, modifier keys, composition, and held-key repeats.
@@ -37,18 +45,18 @@ The homepage has no entrance fade. The underscore in the hero and compact name b
 
 Each page defines its own description. The shared layout adds Open Graph and Twitter metadata. The preview image is `public/social-preview.png`; its editable source is `public/social-preview.svg`.
 
-Set `SITE_URL` to the final public origin when building:
+The public origin defaults to `https://hamzaboutaleb.github.io`. To use a custom domain, set `SITE_URL` when building:
 
 ```sh
 SITE_URL=https://your-domain.com npm run build
 ```
 
-This enables canonical links and absolute social-image URLs. Without `SITE_URL`, those URL tags are omitted so local development URLs are not published. The site continues to build locally.
+Canonical links and absolute social-image URLs use this public origin, including during local builds, so local development URLs are not published.
 
 
 ## Writing a blog post
 
-Copy `src/content/blog/first-post.md` to a new filename, replace its text, and edit the frontmatter:
+Create a Markdown file in `src/content/blog/`, such as `my-post.md`, with frontmatter and article text:
 
 ```md
 ---
@@ -82,7 +90,7 @@ Client behavior is in `src/scripts/article.ts`; article markup and styling are i
 
 Unfinished reading positions are saved locally per article. Returning readers can choose **Continue reading** or **Start over**; the page never jumps automatically. Memory tracks a section and relative offset, with a whole-article fallback if that section changes. Finishing clears the bookmark, and direct section links take priority. Storage failures do not prevent reading.
 
-Markdown images referenced from `public/` automatically receive dimensions at build time through `src/plugins/article-images.mjs`. Images stored beside Markdown in `src/` use Astro’s built-in image handling. Images default to lazy loading and asynchronous decoding, and have a subtle background while loading. If writing a raw HTML image or using a remote image, provide its actual `width` and `height` to reserve the correct space. The demo includes `/images/demo-search-flow.svg` as an example.
+Markdown images referenced from `public/` automatically receive dimensions at build time through `src/plugins/article-images.mjs`. Images stored beside Markdown in `src/` use Astro’s built-in image handling. Images default to lazy loading and asynchronous decoding, and have a subtle background while loading. If writing a raw HTML image or using a remote image, provide its actual `width` and `height` to reserve the correct space.
 
 On mobile, the existing reading toolbar docks above the safe-area inset after its header position scrolls offscreen. A placeholder preserves the article layout, and the toolbar returns to the header when scrolling back or switching to desktop width. It stops docking once the article body has passed. The controls keep their state and keyboard focus because the same elements are reused.
 
