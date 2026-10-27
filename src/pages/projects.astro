@@ -1,0 +1,100 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { projects, projectCategories } from '../data/projects';
+import { contact } from '../data/contact';
+import ProjectGallery from '../components/ProjectGallery.astro';
+import ProjectImageViewer from '../components/ProjectImageViewer.astro';
+---
+<Layout title="Projects — Hamza Boutaleb" description="Software projects and experiments by Hamza Boutaleb, a software engineer interested in web development and computer systems.">
+  <header class="projects-intro">
+    <h1>Projects</h1>
+    <p>From web applications to the systems underneath them. A selection of things I’ve built to solve problems and understand how software works.</p>
+    <a class="github-link" href={contact.github}>Browse GitHub <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <section class="featured" aria-labelledby="featured-heading">
+    <div class="section-heading"><h2 id="featured-heading">All projects</h2><span id="project-count" role="status" aria-live="polite" aria-atomic="true">{projects.length} projects</span></div>
+    <div class="project-filters" role="group" aria-label="Filter projects by category" hidden>
+      {['All', ...projectCategories].map(category => (
+        <button type="button" data-category={category} aria-pressed={category === 'All' ? 'true' : 'false'} aria-controls="project-list">{category}<span aria-hidden="true">{category === 'All' ? projects.length : projects.filter(project => project.filter === category).length}</span></button>
+      ))}
+    </div>
+    <ul class="project-list" id="project-list">
+      {projects.map(project => (
+        <li data-category={project.filter}>
+          <article class="featured-project">
+            <div class="project-overview">
+              <span class="category">{project.category}</span>
+              <h3>{project.name}</h3>
+              <p class="subtitle">{project.subtitle}</p>
+              <ul class="technologies" aria-label={`${project.name} technologies`}>
+                {project.technologies.map(technology => <li>{technology}</li>)}
+              </ul>
+              {project.sources?.length && (
+                <div class="project-sources">
+                  {project.sources.map(source => <a href={source.href} aria-label={`${project.name}: ${source.label}`}>{source.label}<span aria-hidden="true">↗</span></a>)}
+                </div>
+              )}
+              {project.images && project.images.length > 0 && <ProjectGallery name={project.name} images={project.images} />}
+            </div>
+            <div class="project-details">
+              <p class="description">{project.description}</p>
+              <h4>My contribution</h4>
+              <ul class="contributions">{project.contribution.map(item => <li>{item}</li>)}</ul>
+            </div>
+          </article>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <div class="projects-contact"><p>Have a project in mind?</p><a href="/contact">Let’s talk <span aria-hidden="true">↗</span></a></div>
+  <ProjectImageViewer />
+</Layout>
+
+<script>
+  import '../scripts/project-filters';
+  import '../scripts/project-gallery';
+</script>
+
+<style>
+  .projects-intro > p { max-width: 62ch; line-height: 1.8; font-size: 0.9375rem; margin-top: 20px; }
+  .featured { margin-top: 48px; }
+  .section-heading { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 10px 20px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+  .section-heading h2 { margin: 0; font-size: 1rem; line-height: 1.6; font-weight: 600; letter-spacing: normal; }
+  .section-heading > span { color: var(--muted); font-size: 0.75rem; }
+  .project-filters { display: flex; flex-wrap: wrap; gap: 6px; padding: 16px 0; border-bottom: 1px solid var(--border); }
+  .project-filters[hidden] { display: none; }
+  .project-filters button { display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 7px 12px; border: 1px solid transparent; border-radius: 999px; background: transparent; color: var(--muted); font: inherit; font-size: 0.75rem; line-height: 1.5; cursor: pointer; transition: color 160ms ease, background-color 160ms ease; }
+  .project-filters button span { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding-inline: 4px; border-radius: 999px; background: color-mix(in srgb, var(--text) 5%, var(--background)); color: var(--muted); font-size: 0.625rem; font-variant-numeric: tabular-nums; }
+  .project-filters button:hover { color: var(--text); background: color-mix(in srgb, var(--text) 4%, var(--background)); }
+  .project-filters button[aria-pressed='true'] { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 25%, var(--background)); background: color-mix(in srgb, var(--accent) 9%, var(--background)); }
+  .project-filters button[aria-pressed='true'] span { color: var(--accent); background: color-mix(in srgb, var(--accent) 15%, var(--background)); }
+  .github-link, .project-sources a { display: inline-flex; align-items: baseline; gap: 8px; color: var(--accent); font-size: 0.8125rem; text-decoration: none; border-bottom: 1px solid transparent; padding-block: 6px; }
+  .github-link { margin-top: 12px; }
+  .github-link:hover, .project-sources a:hover { border-bottom-color: currentColor; }
+  .project-sources { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 16px; }
+  .project-list { list-style: none; margin: 0; padding: 0; }
+  .project-list > li { border-bottom: 1px solid var(--border); }
+  .featured-project { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 48px; padding: 36px 0; }
+  .category { display: block; color: var(--muted); font-size: 0.6875rem; line-height: 1.7; }
+  h3 { margin: 8px 0 0; font-size: 1.625rem; font-weight: 600; line-height: 1.25; letter-spacing: -0.035em; overflow-wrap: anywhere; }
+  .subtitle { color: var(--text); font-size: 0.875rem; line-height: 1.7; margin: 10px 0 0; }
+  .description { margin: 0; color: var(--muted); font-size: 0.875rem; line-height: 1.85; }
+  .project-details h4 { margin: 22px 0 10px; font-size: 0.75rem; font-weight: 600; color: var(--text); }
+  .contributions { margin: 0; padding-left: 17px; color: var(--muted); font-size: 0.8125rem; line-height: 1.85; }
+  .contributions > li + li { margin-top: 10px; }
+  .technologies { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; padding: 0; margin: 18px 0 0; }
+  .technologies > li { padding: 3px 8px; color: var(--muted); border: 1px solid var(--border); border-radius: 4px; font-size: 0.6875rem; line-height: 1.6; }
+  .projects-contact { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 40px; }
+  .projects-contact p { margin: 0; font-size: 0.9375rem; }
+  .projects-contact a { display: inline-flex; gap: 10px; padding-block: 6px; border-bottom: 1px solid transparent; color: var(--accent); font-size: 0.875rem; text-decoration: none; }
+  .projects-contact a:hover { border-bottom-color: currentColor; }
+  @media (max-width: 640px) {
+    .featured { margin-top: 36px; }
+    .featured-project { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+    .featured-project { padding-block: 28px; }
+  }
+  @media (pointer: coarse) { .project-filters button { min-height: 44px; } }
+  @media (prefers-reduced-motion: reduce) { .project-filters button { transition: none; } }
+</style>

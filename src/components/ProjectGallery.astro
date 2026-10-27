@@ -1,0 +1,59 @@
+---
+import type { ProjectImage } from '../data/projects';
+interface Props { name: string; images: ProjectImage[]; }
+const { name, images } = Astro.props;
+---
+<div class="project-gallery" data-project-name={name} role="group" aria-label={`${name} images`}>
+  <div class="gallery-frame">
+  <div class="gallery-track">
+    {images.map((image, index) => (
+      <a class="gallery-slide" href={image.src} aria-label={`Enlarge ${name} image ${index + 1}: ${image.alt}`}>
+        <img src={image.src} alt={image.alt} width={image.width} height={image.height} loading="lazy" decoding="async" />
+        <span class="enlarge-hint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5" /></svg></span>
+      </a>
+    ))}
+  </div>
+  {images.length > 1 && <>
+    <button class="gallery-arrow previous" type="button" data-gallery-prev aria-label={`Previous ${name} image`} disabled hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 6-6 6 6 6" /></svg></button>
+    <button class="gallery-arrow next" type="button" data-gallery-next aria-label={`Next ${name} image`} hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m10 6 6 6-6 6" /></svg></button>
+  </>}
+  </div>
+  {images.length > 1 && (
+    <div class="gallery-controls" hidden>
+      <div class="gallery-dots" role="group" aria-label={`Choose ${name} image`}>
+        {images.map((_, index) => <button class="gallery-dot" type="button" data-gallery-index={index} aria-label={`Show ${name} image ${index + 1}`} aria-pressed={index === 0 ? 'true' : 'false'}><span></span></button>)}
+      </div>
+      <span class="gallery-count" role="status" aria-live="polite" aria-atomic="true">1 / {images.length}</span>
+    </div>
+  )}
+</div>
+
+<style>
+  .project-gallery { width: 100%; max-width: 340px; min-width: 0; margin-top: 20px; }
+  .gallery-frame { position: relative; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .gallery-track { display: flex; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; background: color-mix(in srgb, var(--text) 3%, var(--background)); }
+  .gallery-track::-webkit-scrollbar { display: none; }
+  .gallery-slide { position: relative; display: flex; align-items: center; justify-content: center; flex: 0 0 100%; min-width: 0; aspect-ratio: 16 / 9; scroll-snap-align: start; scroll-snap-stop: always; cursor: zoom-in; }
+  .gallery-slide img { display: block; width: 100%; height: 100%; object-fit: contain; }
+  .gallery-slide:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; }
+  svg { width: 18px; height: 18px; }
+  .enlarge-hint { position: absolute; right: 8px; top: 8px; display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid var(--border); border-radius: 6px; background: var(--background); color: var(--text); }
+  .gallery-controls { position: relative; display: flex; align-items: center; justify-content: center; min-height: 36px; margin-top: 6px; padding-inline: 52px; }
+  .gallery-controls[hidden] { display: none; }
+  .gallery-count { position: absolute; right: 0; color: var(--muted); font-size: 0.6875rem; font-variant-numeric: tabular-nums; }
+  button { font: inherit; cursor: pointer; }
+  button[hidden] { display: none; }
+  .gallery-arrow { position: absolute; top: 50%; transform: translateY(-50%); display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 1px solid var(--border); border-radius: 50%; background: var(--background); color: var(--text); box-shadow: 0 2px 12px rgb(0 0 0 / 12%); }
+  .gallery-arrow.previous { left: 8px; }
+  .gallery-arrow.next { right: 8px; }
+  .gallery-arrow:hover:enabled { color: var(--accent); border-color: var(--accent); }
+  .gallery-arrow:focus-visible { outline-offset: -4px; }
+  .gallery-arrow:disabled { opacity: 0.35; cursor: default; }
+  .gallery-dots { display: flex; flex-wrap: wrap; justify-content: center; gap: 0; }
+  .gallery-dot { display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%; background: transparent; }
+  .gallery-dot span { display: block; width: 6px; height: 6px; border-radius: 999px; background: var(--subtle); transition: width 160ms ease, background-color 160ms ease; }
+  .gallery-dot[aria-pressed='true'] span { width: 18px; background: var(--accent); }
+  .gallery-dot:hover span { background: var(--accent); }
+  @media (pointer: coarse) { .gallery-arrow, .gallery-dot { width: 44px; height: 44px; } }
+  @media (prefers-reduced-motion: reduce) { .gallery-dot span { transition: none; } }
+</style>

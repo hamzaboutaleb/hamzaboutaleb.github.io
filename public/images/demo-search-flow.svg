@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360">
+  <rect width="1200" height="360" rx="12" fill="#f0f3f9" />
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="60" y="65" font-size="18" fill="#64748b" letter-spacing="2">A SMALL SEARCH, STEP BY STEP</text>
+    <g fill="#fafcff" stroke="#b8c7df" stroke-width="2">
+      <rect x="60" y="120" width="300" height="120" rx="8" />
+      <rect x="450" y="120" width="300" height="120" rx="8" />
+      <rect x="840" y="120" width="300" height="120" rx="8" />
+    </g>
+    <g fill="#253347" font-size="28" text-anchor="middle">
+      <text x="210" y="190">Search input</text><text x="600" y="190">Match titles</text><text x="990" y="190">Show results</text>
+    </g>
+    <g stroke="#2563eb" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M382 180h45m-11-11 11 11-11 11M772 180h45m-11-11 11 11-11 11" />
+    </g>
+    <text x="60" y="305" font-size="20" fill="#64748b">All in the browser. No server request needed for this example.</text>
+  </g>
+</svg>

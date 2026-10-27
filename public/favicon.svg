@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Hamza Boutaleb — hb_</title>
+  <rect width="64" height="64" rx="13" fill="#222" />
+  <g fill="none" stroke="#faf9f6" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10 18v27m0-12c0-10 14-10 14 0v12" />
+    <path d="M33 18v27m0-10c0-11 13-11 13 0s-13 11-13 0" />
+  </g>
+  <path d="M50 45h7" fill="none" stroke="#8ab4ff" stroke-width="3.5" stroke-linecap="square" />
+</svg>

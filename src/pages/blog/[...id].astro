@@ -1,0 +1,221 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import { getPublishedPosts, formatPostDate, readingMinutes } from '../../lib/blog';
+import { getRelatedPosts } from '../../lib/related-posts';
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  return posts.map((post, index) => ({
+    params: { id: post.id },
+    props: {
+      post,
+      older: posts[index + 1] ? { id: posts[index + 1].id, title: posts[index + 1].data.title } : null,
+      newer: posts[index - 1] ? { id: posts[index - 1].id, title: posts[index - 1].data.title } : null,
+      related: getRelatedPosts(post, posts).map(entry => ({ id: entry.id, title: entry.data.title, description: entry.data.description })),
+    },
+  }));
+}
+interface Neighbor { id: string; title: string; }
+interface Props { post: CollectionEntry<'blog'>; older: Neighbor | null; newer: Neighbor | null; related: (Neighbor & { description: string })[]; }
+const { post, older, newer, related } = Astro.props;
+const { Content, headings } = await render(post);
+const contents = headings.filter(heading => heading.depth === 2 || heading.depth === 3);
+---
+<Layout title={`${post.data.title} — Hamza Boutaleb`} description={post.data.description} type="article" publishedTime={post.data.pubDate.toISOString()}>
+  <div class="reading-progress" aria-hidden="true" hidden><span id="reading-progress-fill"></span></div>
+  <article class:list={{ 'with-toc': contents.length > 0 }}>
+    <div class="article-heading">
+    <a class="back-link" href="/blog/">← All writing</a>
+    <header>
+      <div class="post-meta"><time datetime={post.data.pubDate.toISOString()}>{formatPostDate(post.data.pubDate)}</time><span>~{readingMinutes(post.body)} min read</span></div>
+      <h1>{post.data.title}</h1>
+      <p class="description">{post.data.description}</p>
+      <p class="byline">By Hamza Boutaleb</p>
+      <div class="article-tools-slot">
+      <div class="article-tools">
+      <div class="reading-controls" role="group" aria-label="Article text size" hidden>
+        <span aria-hidden="true">Text size</span>
+        <div class="size-segments">
+          <button type="button" data-reading-size="normal" aria-pressed="true" aria-label="Default text size" title="Default text size"><span aria-hidden="true">A</span></button>
+          <button type="button" data-reading-size="large" aria-pressed="false" aria-label="Larger text size" title="Larger text size"><span aria-hidden="true">A+</span></button>
+        </div>
+      </div>
+      <button id="focus-toggle" type="button" aria-pressed="false" aria-label="Focus mode" title="Focus mode" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3" /></svg>
+        Focus
+      </button>
+      </div>
+      </div>
+      <div id="reading-resume" role="region" aria-label="Saved reading position" hidden>
+        <p id="resume-message"></p>
+        <div class="resume-actions">
+          <button id="continue-reading" type="button">Continue reading <span aria-hidden="true">↘</span></button>
+          <button id="restart-reading" type="button">Start over</button>
+        </div>
+      </div>
+    </header>
+    </div>
+    {contents.length > 0 && (
+      <aside class="toc-sidebar">
+      <nav class="article-toc" aria-label="Table of contents">
+        <details open>
+          <summary>On this page</summary>
+          <ol>
+            {contents.map(heading => <li class:list={{ nested: heading.depth === 3 }}><a href={`#${heading.slug}`}>{heading.text}</a></li>)}
+          </ol>
+        </details>
+      </nav>
+      </aside>
+    )}
+    <div class="article-body">
+    <div class="prose" data-reading-id={post.id}><Content /></div>
+    <div class="article-footer">
+      {related.length > 0 && <section class="related-reading" aria-labelledby="related-reading-title">
+        <h2 id="related-reading-title">Related reading</h2>
+        <ul>{related.map(entry => <li><a href={`/blog/${entry.id}/`}><span class="related-title">{entry.title}<span aria-hidden="true">↗</span></span><span class="related-description">{entry.description}</span></a></li>)}</ul>
+      </section>}
+      {(older || newer) && <nav class="article-pagination" aria-label="Article navigation">
+        {older && <a href={`/blog/${older.id}/`}><span class="pagination-label">← Previous article</span><span class="pagination-title">{older.title}</span></a>}
+        {newer && <a class="next" href={`/blog/${newer.id}/`}><span class="pagination-label">Next article →</span><span class="pagination-title">{newer.title}</span></a>}
+      </nav>}
+      <a href="/blog/">← Back to all writing</a>
+    </div>
+    </div>
+  </article>
+  <button id="exit-focus" type="button" hidden>Exit focus mode <kbd>Esc</kbd></button>
+</Layout>
+
+<script>
+  import '../../scripts/article';
+</script>
+
+<style>
+  article { max-width: 70ch; margin: 0 auto; }
+  .article-heading, .article-body, .toc-sidebar { min-width: 0; }
+  .back-link, .article-footer a { color: var(--muted); font-size: 0.8125rem; text-underline-offset: 5px; }
+  .back-link:hover, .article-footer a:hover { color: var(--accent); }
+  header { margin-top: 32px; padding-bottom: 28px; border-bottom: 1px solid var(--border); }
+  .post-meta { display: flex; flex-wrap: wrap; gap: 16px; font-size: 0.75rem; color: var(--muted); margin-bottom: 18px; }
+  h1 { font-size: clamp(2rem, 5vw, 3rem); line-height: 1.2; letter-spacing: -0.04em; }
+  .description { font-size: 1rem; line-height: 1.8; }
+  .byline { font-size: 0.75rem; margin-top: 20px; }
+  #reading-resume { margin-top: 24px; padding: 16px 18px; border-left: 2px solid var(--accent); background: color-mix(in srgb, var(--accent) 5%, var(--background)); }
+  #resume-message { margin: 0; font-size: 0.8125rem; line-height: 1.8; }
+  .resume-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 10px; }
+  .resume-actions button { min-height: 40px; border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 0.75rem; padding: 8px 0; cursor: pointer; }
+  #continue-reading { color: var(--accent); font-weight: 600; }
+  #continue-reading span { margin-left: 8px; }
+  .resume-actions button:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .article-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 24px; margin-top: 24px; }
+  .article-tools-slot { display: flow-root; }
+  .reading-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .reading-controls[hidden] { display: none; }
+  .reading-controls > span { font-size: 0.75rem; color: var(--muted); }
+  .size-segments { display: inline-flex; flex-shrink: 0; align-items: center; gap: 2px; padding: 2px; border: 1px solid var(--border); border-radius: 6px; }
+  .reading-controls button { min-width: 44px; min-height: 40px; padding: 8px 10px; border: 0; border-radius: 4px; background: transparent; color: var(--muted); font: inherit; font-size: 0.875rem; cursor: pointer; }
+  .reading-controls button:last-child { font-size: 1rem; }
+  .reading-controls button:hover { color: var(--text); background: color-mix(in srgb, var(--text) 4%, var(--background)); }
+  .reading-controls button:focus-visible { outline-offset: -2px; }
+  .reading-controls button[aria-pressed='true'] { color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--background)); }
+  #focus-toggle, #exit-focus { font: inherit; font-size: 0.75rem; min-height: 40px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 4px; color: var(--muted); background: var(--background); cursor: pointer; }
+  #focus-toggle:hover, #exit-focus:hover { color: var(--accent); border-color: var(--accent); }
+  #focus-toggle { min-height: 46px; border-color: transparent; background: transparent; }
+  #focus-toggle:not([hidden]) { display: inline-flex; align-items: center; gap: 8px; }
+  #focus-toggle:hover { border-color: transparent; background: color-mix(in srgb, var(--text) 4%, var(--background)); }
+  #focus-toggle svg { width: 16px; height: 16px; flex-shrink: 0; }
+  #focus-toggle[aria-pressed='true'] { color: var(--accent); }
+  #exit-focus { position: fixed; top: 16px; right: 24px; z-index: 40; box-shadow: 0 2px 12px #0000000a; }
+  #exit-focus kbd { margin-left: 8px; font: inherit; color: var(--subtle); }
+  .reading-progress { position: fixed; top: 0; left: 0; width: 100%; height: 3px; z-index: 30; pointer-events: none; }
+  #reading-progress-fill { display: block; width: 100%; height: 100%; background: var(--accent); transform: scaleX(0); transform-origin: left; }
+  .article-toc { display: block; margin: 28px 0 0; padding: 20px; border: 1px solid var(--border); border-radius: 5px; }
+  .article-toc details { width: 100%; }
+  .article-toc summary { cursor: pointer; font-size: 0.75rem; font-weight: 500; color: var(--muted); }
+  .article-toc summary::marker { font-size: 0.625rem; color: var(--subtle); }
+  .article-toc ol { list-style: none; padding: 0; margin: 20px 0 0; border-left: 1px solid var(--border); }
+  .article-toc li + li { margin-top: 12px; }
+  .article-toc li.nested { margin-top: 2px; }
+  .article-toc .nested + li:not(.nested) { margin-top: 14px; }
+  .article-toc a { position: relative; display: block; padding: 7px 8px 7px 16px; font-size: 0.8125rem; font-weight: 500; line-height: 1.7; color: var(--muted); text-decoration: none; transition: color 150ms ease; }
+  .article-toc .nested a { padding-left: 30px; font-size: 0.75rem; font-weight: 400; }
+  .article-toc a::before { content: ''; position: absolute; left: -1px; top: 7px; bottom: 7px; width: 2px; border-radius: 1px; background: transparent; }
+  .article-toc a:is(:hover, :focus-visible) { color: var(--text); text-decoration: none; }
+  .article-toc a:focus-visible { outline-offset: -2px; border-radius: 3px; }
+  .article-toc a[aria-current='location'] { color: var(--accent); }
+  .article-toc a[aria-current='location']::before { background: var(--accent); }
+  .prose { margin-top: 32px; font-size: 1rem; line-height: 1.85; overflow-wrap: anywhere; }
+  :global(:root[data-reading-size='large']) .prose { font-size: 1.125rem; }
+  .prose :global(p), .prose :global(li) { color: var(--text); }
+  .prose :global(p) { margin: 1.5em 0; }
+  .prose :global(h2) { margin: 2em 0 0.7em; font-size: 1.5em; letter-spacing: -0.03em; line-height: 1.4; }
+  .prose :global(h3) { margin: 1.8em 0 0.6em; font-size: 1.2em; line-height: 1.4; }
+  .prose > :global(:first-child) { margin-top: 0; }
+  .prose :global(h4) { margin-top: 24px; }
+  .prose :global(h2), .prose :global(h3), .prose :global(h4) { scroll-margin-top: 24px; }
+  .prose :global(ul), .prose :global(ol) { padding-left: 1.5em; margin-block: 1.5em; }
+  .prose :global(li + li) { margin-top: 0.55em; }
+  .prose :global(a) { color: var(--accent); text-underline-offset: 4px; }
+  .prose :global(blockquote) { margin: 2em 0; padding: 18px 24px; border-left: 2px solid var(--accent); border-radius: 0 5px 5px 0; background: color-mix(in srgb, var(--text) 2%, var(--background)); font-size: 1.125em; line-height: 1.75; }
+  .prose :global(blockquote p) { color: var(--text); margin: 0; }
+  .prose :global(blockquote p + p) { margin-top: 1em; }
+  .prose :global(img) { display: block; max-width: 100%; height: auto; border-radius: 4px; background: color-mix(in srgb, var(--text) 4%, var(--background)); }
+  .prose :global(pre) { max-width: 100%; overflow-x: auto; padding: 20px; border: 1px solid var(--border); border-radius: 5px; line-height: 1.7; font-size: 0.8125em; }
+  .prose :global(.code-block) { max-width: 100%; margin: 28px 0; border: 1px solid var(--border); border-radius: 5px; overflow: hidden; }
+  .prose :global(.code-block pre) { margin: 0; border: 0; border-radius: 0; }
+  .prose :global(pre),
+  .prose :global(pre code) { white-space: pre-wrap; overflow-wrap: anywhere; word-break: normal; }
+  .prose :global(.code-toolbar) { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 6px 12px 6px 18px; border-bottom: 1px solid var(--border); font-size: 0.75rem; line-height: 1.6; background: color-mix(in srgb, var(--text) 2%, var(--background)); }
+  .prose :global(.code-language) { font-weight: 500; color: var(--muted); }
+  .prose :global(.code-actions) { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .prose :global(.code-feedback) { color: var(--muted); }
+  .prose :global(.copy-code) { min-width: 36px; min-height: 36px; font: inherit; color: var(--muted); background: transparent; border: 0; border-radius: 4px; padding: 10px; cursor: pointer; }
+  .prose :global(.copy-code svg) { display: block; width: 16px; height: 16px; }
+  .prose :global(.copy-code:is(:hover, :focus-visible)) { color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--background)); }
+  .prose :global(code) { font-family: ui-monospace, monospace; }
+  .prose :global(:not(pre) > code) { font-size: 0.86em; font-variant-ligatures: none; letter-spacing: 0; padding: 0.12em 0.4em; border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent); border-radius: 4px; color: color-mix(in srgb, var(--accent) 75%, var(--text)); background: color-mix(in srgb, var(--accent) 7%, var(--background)); -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .prose :global(table) { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; font-size: 0.875em; }
+  .prose :global(th), .prose :global(td) { padding: 10px 14px; border: 1px solid var(--border); text-align: left; }
+  .prose :global(hr) { margin: 36px 0; border: 0; border-top: 1px solid var(--border); }
+  .article-footer { margin-top: 64px; padding-top: 36px; border-top: 1px solid var(--border); }
+  .related-reading { padding-bottom: 36px; margin-bottom: 28px; border-bottom: 1px solid var(--border); }
+  .related-reading h2 { margin: 0; font-size: 1.125rem; font-weight: 600; letter-spacing: -0.02em; }
+  .related-reading ul { list-style: none; padding: 0; margin: 20px 0 0; }
+  .related-reading li + li { margin-top: 12px; }
+  .related-reading a { display: block; padding: 16px 0; text-decoration: none; }
+  .related-title { display: inline-flex; align-items: baseline; gap: 12px; font-size: 1.0625rem; font-weight: 600; line-height: 1.6; color: var(--text); }
+  .related-title > span { color: var(--accent); }
+  .related-description { display: block; max-width: 62ch; margin-top: 10px; font-size: 0.875rem; color: var(--muted); line-height: 1.8; }
+  .related-reading a:is(:hover, :focus-visible) .related-title { color: var(--accent); }
+  .article-pagination { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin: 0 0 28px; }
+  .article-pagination a { display: block; padding: 12px 0; text-decoration: none; }
+  .article-pagination .next { grid-column: 2; text-align: right; }
+  .pagination-label { display: block; font-size: 0.6875rem; color: var(--muted); }
+  .pagination-title { display: block; font-size: 0.8125rem; line-height: 1.6; font-weight: 500; color: var(--muted); margin-top: 8px; }
+  .article-pagination a:is(:hover, :focus-visible) .pagination-title { color: var(--accent); }
+  @media (min-width: 960px) {
+    article.with-toc { display: grid; grid-template-columns: minmax(0, 1fr) 224px; column-gap: 40px; align-items: start; max-width: none; }
+    .with-toc .article-heading { grid-column: 1; grid-row: 1; }
+    .with-toc .article-body { grid-column: 1; grid-row: 2; }
+    .toc-sidebar { grid-column: 2; grid-row: 2; position: sticky; top: 24px; align-self: start; margin-top: 32px; max-height: calc(100vh - 48px); max-height: calc(100svh - 48px); overflow-y: auto; }
+    .article-toc { margin: 0; padding: 0; border: 0; border-radius: 0; }
+  }
+  @media (max-width: 520px) {
+    .article-pagination { grid-template-columns: 1fr; gap: 12px; }
+    .article-pagination .next { grid-column: auto; text-align: left; }
+  }
+  @media (max-width: 760px) {
+    .article-body { padding-bottom: 92px; }
+    .article-tools[data-docked='true'] { position: fixed; left: 16px; right: 16px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 25; justify-content: center; gap: 8px 16px; margin: 0; padding: 8px 12px; background: var(--background); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 4px 24px #00000018; }
+    .article-tools[data-docked='true'] .reading-controls { gap: 8px; }
+    .article-tools[data-docked='true'] .reading-controls > span { display: none; }
+    .prose :global(blockquote) { padding: 16px 18px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .article-toc a { transition: none; }
+  }
+  :global(:root[data-focus-mode='true']) article.with-toc { display: block; max-width: 70ch; }
+  :global(:root[data-focus-mode='true']) .toc-sidebar,
+  :global(:root[data-focus-mode='true']) .article-footer,
+  :global(:root[data-focus-mode='true']) .back-link { display: none; }
+</style>

@@ -1,0 +1,48 @@
+---
+import Layout from '../layouts/Layout.astro';
+import DestinationNav from '../components/DestinationNav.astro';
+---
+<Layout title="Hamza Boutaleb — Software engineer" description="Software engineer Hamza Boutaleb’s portfolio and blog. Coding since 13, building for the web, and exploring operating systems, networks, and compilers." home>
+  <header>
+    <div class="identity">
+      <h1><span class="name-first">Hamza</span> <span class="surname name-last">Boutaleb<span class="underscore" aria-hidden="true">_</span></span></h1>
+      <p class="role">Software engineer</p>
+    </div>
+    <div class="intro-copy">
+      <p class="introduction">My first programming question was how games and forums worked. I started coding at 13, and that curiosity took me from building websites to exploring operating systems, networks, and compilers.</p>
+      <p class="introduction">I still enjoy making things and figuring out what makes them work.</p>
+    </div>
+  </header>
+
+  <DestinationNav />
+</Layout>
+
+<script>
+  const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-shortcut]'));
+  links.forEach(link => link.setAttribute('aria-keyshortcuts', link.dataset.shortcut ?? ''));
+  document.addEventListener('keydown', event => {
+    if (event.defaultPrevented || event.repeat || event.isComposing || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
+    const target = event.target;
+    if (target instanceof Element && target.closest('input, textarea, select, button, [contenteditable]:not([contenteditable="false"]), [role="textbox"], [role="combobox"], [role="slider"], [role="spinbutton"]')) return;
+    const link = links.find(item => item.dataset.shortcut === event.key);
+    if (!link) return;
+    event.preventDefault();
+    link.click();
+  });
+</script>
+
+<style>
+  header { view-transition-name: home-intro; display: grid; grid-template-columns: 1fr 1.1fr; align-items: center; gap: 64px; text-align: left; }
+  .identity, .intro-copy { min-width: 0; }
+  h1 { font-size: clamp(2.75rem, 6vw, 4.75rem); line-height: 1.08; letter-spacing: -0.055em; }
+  .surname { white-space: nowrap; }
+  .underscore { color: var(--accent); }
+  .intro-copy { padding-top: 0; }
+  .role { margin: 20px 0 0; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); }
+  .introduction { max-width: 46ch; margin: 0 auto; font-size: 0.9375rem; line-height: 1.8; }
+  .introduction + .introduction { margin-top: 16px; }
+  @media (max-width: 760px) {
+    header { grid-template-columns: 1fr; gap: 24px; }
+    .introduction { max-width: 48ch; }
+  }
+</style>

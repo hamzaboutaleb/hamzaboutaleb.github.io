@@ -1,0 +1,48 @@
+---
+interface Props { compact?: boolean; }
+const { compact = false } = Astro.props;
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+const destinations = [
+  { href: '/projects', title: 'Projects', description: 'Things I build.', transition: 'nav-projects' },
+  { href: '/blog', title: 'Blog', description: 'Things I write.', transition: 'nav-blog' },
+  { href: '/about', title: 'About', description: 'A little about me.', transition: 'nav-about' },
+  { href: '/contact', title: 'Contact me', description: 'Let’s get in touch.', transition: 'nav-contact' },
+];
+---
+<nav class:list={['destinations', { compact }]} aria-label="Main navigation">
+  {destinations.map((destination, index) => (
+    <a href={destination.href} data-shortcut={!compact ? index + 1 : undefined} aria-current={currentPath === destination.href || currentPath.startsWith(`${destination.href}/`) ? 'page' : undefined}>
+      <span class="destination-title" style={`view-transition-name: ${destination.transition}`}>
+        {destination.title}<span class="destination-arrow" aria-hidden="true">→</span>
+      </span>
+      {!compact && <span class="destination-description">{destination.description}</span>}
+    </a>
+  ))}
+</nav>
+
+<style>
+  .destinations { view-transition-name: destination-nav; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 80px 0 0; }
+  .destinations a { display: block; min-width: 0; min-height: 108px; padding: 22px clamp(10px, 1.5vw, 18px); border-top: 1px solid var(--border); color: var(--text); text-decoration: none; transition: border-color 180ms ease, background-color 180ms ease; }
+  .destination-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 1rem; font-weight: 600; transition: color 180ms ease; }
+  .destination-arrow { color: var(--accent); transition: transform 150ms ease; }
+  .destination-description { display: block; margin-top: 8px; font-size: 0.8125rem; color: var(--muted); }
+  .destinations a:is(:hover, :focus-visible, [aria-current='page']) { border-color: var(--accent); background-color: color-mix(in srgb, var(--accent) 6%, var(--background)); text-decoration: none; }
+  .destinations a:is(:hover, :focus-visible, [aria-current='page']) .destination-title { color: var(--accent); }
+  .destinations a:is(:hover, :focus-visible) .destination-arrow { transform: translateX(4px); }
+  .compact { margin: 0; }
+  .compact a { min-height: 56px; padding-block: 15px; }
+  @media (max-width: 760px) { .destinations:not(.compact) { margin-top: 56px; } }
+  @media (max-width: 640px) {
+    .destinations { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .destinations:not(.compact) { margin-top: 40px; }
+    .destinations a { min-height: 88px; padding: 17px 12px; }
+    .destination-title { gap: 8px; font-size: 0.9375rem; }
+    .destination-description { margin-top: 5px; }
+    .compact a { min-height: 48px; padding-block: 12px; }
+  }
+  @media (max-width: 340px) { .destinations { grid-template-columns: 1fr; } }
+  @media (prefers-reduced-motion: reduce) {
+    .destinations a, .destination-title, .destination-arrow { transition: none; }
+    .destinations a:is(:hover, :focus-visible) .destination-arrow { transform: none; }
+  }
+</style>

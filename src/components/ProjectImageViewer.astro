@@ -1,0 +1,50 @@
+<dialog id="project-image-viewer" aria-labelledby="image-viewer-title">
+  <div class="viewer-panel">
+    <header class="viewer-header">
+      <h2 id="image-viewer-title"></h2>
+      <button type="button" data-viewer-close aria-label="Close image viewer" autofocus>×</button>
+    </header>
+    <div class="viewer-stage">
+      <button type="button" data-viewer-prev aria-label="Previous image">←</button>
+      <div class="viewer-image-area">
+        <img data-viewer-image alt="" decoding="async" hidden />
+        <span class="image-status" data-viewer-status role="status"></span>
+      </div>
+      <button type="button" data-viewer-next aria-label="Next image">→</button>
+    </div>
+    <footer class="viewer-footer">
+      <p data-viewer-caption></p>
+      <span data-viewer-count role="status" aria-live="polite" aria-atomic="true"></span>
+    </footer>
+  </div>
+</dialog>
+
+<style>
+  dialog { position: fixed; inset: 0; box-sizing: border-box; width: 100%; max-width: 100%; height: 100dvh; max-height: 100dvh; margin: 0; padding: 20px; border: 0; background: transparent; color: var(--text); }
+  dialog[open] { display: grid; place-items: center; }
+  dialog::backdrop { background: rgb(0 0 0 / 80%); }
+  .viewer-panel { box-sizing: border-box; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; width: 100%; height: 100%; padding: 16px 20px; border: 1px solid var(--border); border-radius: 12px; background: var(--background); }
+  .viewer-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-bottom: 12px; }
+  h2 { margin: 0; font-size: 0.9375rem; font-weight: 500; overflow-wrap: anywhere; }
+  button { display: grid; place-items: center; flex-shrink: 0; width: 44px; height: 44px; border: 1px solid var(--border); border-radius: 50%; background: transparent; color: var(--text); font: inherit; font-size: 1.25rem; cursor: pointer; }
+  button:hover:enabled { color: var(--accent); border-color: var(--accent); }
+  button:disabled { opacity: 0.3; cursor: default; }
+  button[aria-disabled='true'] { opacity: 0.3; cursor: default; }
+  button[aria-disabled='true']:hover { color: var(--text); border-color: var(--border); }
+  button[hidden] { visibility: hidden; display: grid; }
+  .viewer-stage { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; gap: 16px; min-height: 0; }
+  .viewer-image-area { position: relative; height: 100%; min-width: 0; min-height: 0; display: grid; place-items: center; }
+  .viewer-image-area img { width: 100%; height: 100%; min-height: 0; object-fit: contain; }
+  .image-status { position: absolute; color: var(--muted); font-size: 0.875rem; text-align: center; }
+  .viewer-footer { display: flex; justify-content: space-between; gap: 20px; padding-top: 16px; }
+  .viewer-footer p { margin: 0; color: var(--muted); font-size: 0.75rem; line-height: 1.6; }
+  [data-viewer-count] { flex-shrink: 0; color: var(--muted); font-size: 0.75rem; font-variant-numeric: tabular-nums; }
+  @media (max-width: 640px) {
+    dialog { padding: 8px; }
+    .viewer-panel { padding: 12px; }
+    .viewer-stage { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; grid-template-rows: minmax(0, 1fr) 44px; }
+    .viewer-image-area { grid-column: 1 / -1; grid-row: 1; }
+    [data-viewer-prev] { grid-column: 1; grid-row: 2; justify-self: end; }
+    [data-viewer-next] { grid-column: 2; grid-row: 2; }
+  }
+</style>
