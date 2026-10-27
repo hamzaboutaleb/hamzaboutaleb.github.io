@@ -18,16 +18,20 @@ import DestinationNav from '../components/DestinationNav.astro';
 </Layout>
 
 <script>
-  const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-shortcut]'));
-  links.forEach(link => link.setAttribute('aria-keyshortcuts', link.dataset.shortcut ?? ''));
-  document.addEventListener('keydown', event => {
-    if (event.defaultPrevented || event.repeat || event.isComposing || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
-    const target = event.target;
-    if (target instanceof Element && target.closest('input, textarea, select, button, [contenteditable]:not([contenteditable="false"]), [role="textbox"], [role="combobox"], [role="slider"], [role="spinbutton"]')) return;
-    const link = links.find(item => item.dataset.shortcut === event.key);
-    if (!link) return;
-    event.preventDefault();
-    link.click();
+  import { onPageLoad } from '../scripts/page-lifecycle';
+  onPageLoad(scope => {
+    const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-shortcut]'));
+    if (!links.length) return;
+    links.forEach(link => link.setAttribute('aria-keyshortcuts', link.dataset.shortcut ?? ''));
+    document.addEventListener('keydown', event => {
+      if (event.defaultPrevented || event.repeat || event.isComposing || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
+      const target = event.target;
+      if (target instanceof Element && target.closest('input, textarea, select, button, [contenteditable]:not([contenteditable="false"]), [role="textbox"], [role="combobox"], [role="slider"], [role="spinbutton"]')) return;
+      const link = links.find(item => item.dataset.shortcut === event.key);
+      if (!link) return;
+      event.preventDefault();
+      link.click();
+    }, { signal: scope.signal });
   });
 </script>
 

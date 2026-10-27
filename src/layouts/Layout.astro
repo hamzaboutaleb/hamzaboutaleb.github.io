@@ -2,6 +2,7 @@
 import { contact } from '../data/contact';
 import SocialIcon from '../components/SocialIcon.astro';
 import DestinationNav from '../components/DestinationNav.astro';
+import { ClientRouter } from 'astro:transitions';
 
 interface Props {
   title: string;
@@ -26,6 +27,67 @@ const footerLinks = [
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style is:inline>
+      :root { --background: #faf9f6; --text: #222; --muted: #666; --subtle: #888; --border: #ddd; --accent: #2563eb; color-scheme: light; }
+      :root[data-theme='dark'] { --background: #1c1b1a; --text: #eee; --muted: #aaa; --subtle: #999; --border: #3b3b3b; --accent: #8ab4ff; color-scheme: dark; }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme='light']) { --background: #1c1b1a; --text: #eee; --muted: #aaa; --subtle: #999; --border: #3b3b3b; --accent: #8ab4ff; color-scheme: dark; }
+      }
+      html, body { background: var(--background); color: var(--text); }
+    </style>
+    <script is:inline>
+      (() => {
+        if (window.__portfolioAppearance) { window.__portfolioAppearance(); return; }
+        const system = window.matchMedia('(prefers-color-scheme: dark)');
+        let preference = null;
+        try {
+          const saved = localStorage.getItem('portfolio-theme');
+          if (saved === 'light' || saved === 'dark') preference = saved;
+        } catch {}
+
+        const applyTheme = (target = document) => {
+          const theme = preference || (system.matches ? 'dark' : 'light');
+          target.documentElement.dataset.theme = theme;
+          const toggle = target.getElementById('theme-toggle');
+          if (toggle) {
+            const label = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+            toggle.setAttribute('aria-label', label);
+            toggle.setAttribute('title', label);
+          }
+        };
+        const applyAppearance = (target = document) => {
+          applyTheme(target);
+          let size = 'normal';
+          try { if (localStorage.getItem('portfolio-reading-size') === 'large') size = 'large'; } catch {}
+          target.documentElement.dataset.readingSize = size;
+          delete target.documentElement.dataset.focusMode;
+        };
+        window.__portfolioAppearance = () => applyAppearance();
+        applyAppearance();
+        system.addEventListener('change', () => applyTheme());
+        document.addEventListener('astro:before-swap', event => {
+          // Astro swaps root attributes: prime the incoming document before that happens.
+          if (event.newDocument) applyAppearance(event.newDocument);
+          // Inner-page navigation does not move the identity or menu.
+          if (event.from && event.to && event.from.pathname !== '/' && event.to.pathname !== '/') {
+            event.viewTransition?.ready?.catch(() => {});
+            event.viewTransition?.skipTransition();
+          }
+        });
+        document.addEventListener('astro:after-swap', () => applyAppearance());
+        document.addEventListener('astro:page-load', () => {
+          const toggle = document.getElementById('theme-toggle');
+          if (!toggle) return;
+          toggle.hidden = false;
+          applyTheme();
+          toggle.onclick = () => {
+            preference = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+            try { localStorage.setItem('portfolio-theme', preference); } catch {}
+            applyTheme();
+          };
+        });
+      })();
+    </script>
     <meta name="description" content={description} />
     <meta name="author" content="Hamza Boutaleb" />
     {canonicalURL && <link rel="canonical" href={canonicalURL} />}
@@ -55,48 +117,7 @@ const footerLinks = [
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <title>{title}</title>
-    {type === 'article' && <script is:inline>
-      try {
-        if (localStorage.getItem('portfolio-reading-size') === 'large') {
-          document.documentElement.dataset.readingSize = 'large';
-        }
-      } catch {}
-    </script>}
-    <script is:inline>
-      (() => {
-        const system = window.matchMedia('(prefers-color-scheme: dark)');
-        let preference = null;
-        try {
-          const saved = localStorage.getItem('portfolio-theme');
-          if (saved === 'light' || saved === 'dark') preference = saved;
-        } catch {}
-
-        const applyTheme = () => {
-          const theme = preference || (system.matches ? 'dark' : 'light');
-          document.documentElement.dataset.theme = theme;
-          const toggle = document.getElementById('theme-toggle');
-          if (toggle) {
-            const label = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
-            toggle.setAttribute('aria-label', label);
-            toggle.setAttribute('title', label);
-          }
-        };
-
-        applyTheme();
-        system.addEventListener('change', applyTheme);
-        document.addEventListener('DOMContentLoaded', () => {
-          const toggle = document.getElementById('theme-toggle');
-          if (!toggle) return;
-          toggle.hidden = false;
-          applyTheme();
-          toggle.addEventListener('click', () => {
-            preference = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-            try { localStorage.setItem('portfolio-theme', preference); } catch {}
-            applyTheme();
-          });
-        }, { once: true });
-      })();
-    </script>
+    <ClientRouter fallback="swap" />
   </head>
   <body class:list={{ 'has-blog-search': blogSearch }}>
     <div class:list={['appearance', { 'has-search': blogSearch }]}>
@@ -126,13 +147,8 @@ const footerLinks = [
 </html>
 
 <style is:global>
-  :root { --background: #faf9f6; --text: #222; --muted: #666; --subtle: #888; --border: #ddd; --accent: #2563eb; color-scheme: light; }
-  :root[data-theme='dark'] { --background: #1c1b1a; --text: #eee; --muted: #aaa; --subtle: #999; --border: #3b3b3b; --accent: #8ab4ff; color-scheme: dark; }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme='light']) { --background: #1c1b1a; --text: #eee; --muted: #aaa; --subtle: #999; --border: #3b3b3b; --accent: #8ab4ff; color-scheme: dark; }
-  }
   * { box-sizing: border-box; }
-  html { font-family: 'Manrope', system-ui, sans-serif; color: var(--text); background: var(--background); line-height: 1.6; }
+  html { font-family: 'Manrope', system-ui, sans-serif; color: var(--text); background: var(--background); line-height: 1.6; scrollbar-gutter: stable; }
   body { margin: 0; min-height: 100vh; min-height: 100svh; display: grid; grid-template-rows: 64px 1fr auto; }
   :root[data-focus-mode='true'] body { grid-template-rows: 1fr; }
   :root[data-focus-mode='true'] .appearance,
@@ -199,11 +215,12 @@ const footerLinks = [
   .footer-links svg { width: 15px; height: 15px; flex-shrink: 0; }
   .footer-links a:is(:hover, :focus-visible) { color: var(--accent); text-decoration: none; }
   .footer-links a:is(:hover, :focus-visible)::after { transform: scaleX(1); }
-  @view-transition { navigation: auto; }
-  @keyframes page-fade-out { to { opacity: 0; } }
-  @keyframes page-fade-in { from { opacity: 0; } }
-  ::view-transition-old(root) { animation: page-fade-out 180ms ease-out both; }
-  ::view-transition-new(root) { animation: page-fade-in 180ms ease-in both; }
+  ::view-transition { background: var(--background); }
+  ::view-transition-image-pair(*) { isolation: isolate; }
+  ::view-transition-old(*) { animation: none; opacity: 0; mix-blend-mode: normal; }
+  ::view-transition-new(*) { animation: none; opacity: 1; mix-blend-mode: normal; }
+  ::view-transition-group(home-intro),
+  ::view-transition-group(page-content) { animation: none; }
   ::view-transition-group(destination-nav),
   ::view-transition-group(identity-first),
   ::view-transition-group(identity-last),
@@ -214,14 +231,9 @@ const footerLinks = [
     animation-duration: 480ms;
     animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   }
-  @keyframes content-reveal { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-  ::view-transition-old(home-intro), ::view-transition-old(page-content) { animation: page-fade-out 140ms ease-out both; }
-  ::view-transition-new(page-content) { animation: content-reveal 240ms ease-out 480ms both; }
-  ::view-transition-new(home-intro) { animation: page-fade-in 260ms ease-out 180ms both; }
   @media (prefers-reduced-motion: reduce) {
     .blog-search { transition: none; }
     .footer-links a, .footer-links a::after { transition: none; }
-    @view-transition { navigation: none; }
     ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none; }
   }
 </style>

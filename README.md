@@ -33,7 +33,11 @@ In the repository’s **Settings → Pages → Build and deployment**, set **Sou
 
 No `base` prefix is needed for this repository name. `SITE_URL` can override the site URL when moving to a custom domain.
 
-The homepage uses a four-column destination row on desktop and a 2×2 grid on mobile, with a single-column fallback on very narrow screens. In browsers supporting native cross-document view transitions, the navigation moves from its homepage position to a compact bar at the top of the destination page over 480ms, then content fades in over 240ms. Matching transition names preserve the navigation labels through the movement. The name at the top links home. Other browsers navigate normally, and reduced-motion preferences disable the transition.
+The homepage uses a four-column destination row on desktop and a 2×2 grid on mobile, with a single-column fallback on very narrow screens. Astro’s `ClientRouter` handles internal navigation and browser Back/Forward without full document reloads. In supported browsers, the name and navigation move between their homepage and compact positions over 480ms when entering or leaving home. Inner-page navigation skips snapshot animations, keeping the name and menu still. All snapshot pairs use normal blending without cross-fades, and the transition overlay keeps the page’s background color. Unsupported browsers swap content without animation, and reduced-motion preferences disable animations. Downloads, image-file fallbacks, and external links keep their normal browser behavior. Without JavaScript, the static pages still support normal links.
+
+The theme palette and initial theme setup are inline before external stylesheets. During `astro:before-swap`, the incoming document receives the active theme and reading-size preference before Astro replaces the root attributes. Theme controls rebind on `astro:page-load`; the theme also reapplies on `astro:after-swap`. Scrollbar space stays reserved to avoid horizontal movement between short and long pages.
+
+Page controls initialize through `src/scripts/page-lifecycle.ts`. Before leaving a page, global listeners are aborted, observers disconnect, animation frames and timers are cleared, and reading positions are saved. Focus mode resets on navigation. The site still builds as static HTML for GitHub Pages.
 
 Homepage keyboard shortcuts: `1` Projects, `2` Blog, `3` About, `4` Contact. Shortcuts work without visible hints or controls and ignore typing fields, interactive form controls, modifier keys, composition, and held-key repeats.
 
