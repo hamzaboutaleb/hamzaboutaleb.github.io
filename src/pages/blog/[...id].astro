@@ -133,13 +133,13 @@ const contents = headings.filter(heading => heading.depth === 2 || heading.depth
   .article-toc details { width: 100%; }
   .article-toc summary { cursor: pointer; font-size: 0.75rem; font-weight: 500; color: var(--muted); }
   .article-toc summary::marker { font-size: 0.625rem; color: var(--subtle); }
-  .article-toc ol { list-style: none; padding: 0; margin: 20px 0 0; border-left: 1px solid var(--border); }
-  .article-toc li + li { margin-top: 12px; }
-  .article-toc li.nested { margin-top: 2px; }
-  .article-toc .nested + li:not(.nested) { margin-top: 14px; }
-  .article-toc a { position: relative; display: block; padding: 7px 8px 7px 16px; font-size: 0.8125rem; font-weight: 500; line-height: 1.7; color: var(--muted); text-decoration: none; transition: color 150ms ease; }
+  .article-toc ol { list-style: none; padding: 0; margin: 12px 0 0; border-left: 1px solid var(--border); }
+  .article-toc li + li { margin-top: 2px; }
+  .article-toc li.nested { margin-top: 0; }
+  .article-toc .nested + li:not(.nested) { margin-top: 8px; }
+  .article-toc a { position: relative; display: block; padding: 4px 8px 4px 16px; font-size: 0.8125rem; font-weight: 500; line-height: 1.5; color: var(--muted); text-decoration: none; transition: color 150ms ease; }
   .article-toc .nested a { padding-left: 30px; font-size: 0.75rem; font-weight: 400; }
-  .article-toc a::before { content: ''; position: absolute; left: -1px; top: 7px; bottom: 7px; width: 2px; border-radius: 1px; background: transparent; }
+  .article-toc a::before { content: ''; position: absolute; left: -1px; top: 4px; bottom: 4px; width: 2px; border-radius: 1px; background: transparent; }
   .article-toc a:is(:hover, :focus-visible) { color: var(--text); text-decoration: none; }
   .article-toc a:focus-visible { outline-offset: -2px; border-radius: 3px; }
   .article-toc a[aria-current='location'] { color: var(--accent); }
