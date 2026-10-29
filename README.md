@@ -27,11 +27,11 @@ Static output is in `dist/`.
 
 ## GitHub Pages deployment
 
-The repository is `hamzaboutaleb/hamzaboutaleb.github.io`, published at `https://hamzaboutaleb.github.io`. The workflow in `.github/workflows/deploy.yml` builds Astro with Node 24 and deploys the generated site whenever changes are pushed to `main`. It can also be started manually from the Actions tab.
+The repository is `hamzaboutaleb/hamzaboutaleb.github.io`, hosted on GitHub Pages with `https://hboutale.ma` as its primary public URL. The workflow in `.github/workflows/deploy.yml` builds Astro with Node 24 and deploys the generated site whenever changes are pushed to `main`. It can also be started manually from the Actions tab.
 
 In the repository’s **Settings → Pages → Build and deployment**, set **Source** to **GitHub Actions**. The default branch-based Jekyll build does not build the Astro source. Commit and push the deployment workflow and `astro.config.mjs` changes to trigger the first Astro deployment.
 
-No `base` prefix is needed for this repository name. `SITE_URL` can override the site URL when moving to a custom domain.
+No `base` prefix is needed for this repository name. `SITE_URL` can override the site URL when changing domains.
 
 The homepage uses a four-column destination row on desktop and a 2×2 grid on mobile, with a single-column fallback on very narrow screens. Astro’s `ClientRouter` handles internal navigation and browser Back/Forward without full document reloads. In supported browsers, the name and navigation move between their homepage and compact positions over 480ms when entering or leaving home. Inner-page navigation skips snapshot animations, keeping the name and menu still. All snapshot pairs use normal blending without cross-fades, and the transition overlay keeps the page’s background color. Unsupported browsers swap content without animation, and reduced-motion preferences disable animations. Downloads, image-file fallbacks, and external links keep their normal browser behavior. Without JavaScript, the static pages still support normal links.
 
@@ -49,13 +49,17 @@ The homepage has no entrance fade. The underscore in the hero and compact name b
 
 Each page defines its own description. The shared layout adds Open Graph and Twitter metadata. The preview image is `public/social-preview.png`; its editable source is `public/social-preview.svg`.
 
-The public origin defaults to `https://hamzaboutaleb.github.io`. To use a custom domain, set `SITE_URL` when building:
+The public origin defaults to `https://hboutale.ma`. To use a different domain, set `SITE_URL` when building:
 
 ```sh
 SITE_URL=https://your-domain.com npm run build
 ```
 
 Canonical links and absolute social-image URLs use this public origin, including during local builds, so local development URLs are not published.
+
+Every build generates `sitemap-index.xml` and `sitemap-0.xml` using `@astrojs/sitemap`. The sitemap includes generated pages, including published blog posts; drafts and future-dated posts have no generated routes and are excluded. The shared layout links to the sitemap index, and the generated `robots.txt` advertises its absolute URL using the configured public origin.
+
+After deploying, submit `https://hboutale.ma/sitemap-index.xml` in Google Search Console. If the primary domain changes, submit the same path on that domain instead.
 
 
 ## Writing a blog post
