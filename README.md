@@ -27,7 +27,7 @@ Static output is in `dist/`.
 
 ## GitHub Pages deployment
 
-The repository is `hamzaboutaleb/hamzaboutaleb.github.io`, hosted on GitHub Pages with `https://hboutale.ma` as its primary public URL. The workflow in `.github/workflows/deploy.yml` builds Astro with Node 24 and deploys the generated site whenever changes are pushed to `main`. It can also be started manually from the Actions tab.
+The repository is `hamzaboutaleb/hamzaboutaleb.github.io`, hosted on GitHub Pages with `https://hboutale.me` as its primary public URL. The workflow in `.github/workflows/deploy.yml` builds Astro with Node 24 and deploys the generated site whenever changes are pushed to `main`. It can also be started manually from the Actions tab.
 
 In the repository’s **Settings → Pages → Build and deployment**, set **Source** to **GitHub Actions**. The default branch-based Jekyll build does not build the Astro source. Commit and push the deployment workflow and `astro.config.mjs` changes to trigger the first Astro deployment.
 
@@ -49,7 +49,7 @@ The homepage has no entrance fade. The underscore in the hero and compact name b
 
 Each page defines its own description. The shared layout adds Open Graph and Twitter metadata. The preview image is `public/social-preview.png`; its editable source is `public/social-preview.svg`.
 
-The public origin defaults to `https://hboutale.ma`. To use a different domain, set `SITE_URL` when building:
+The public origin defaults to `https://hboutale.me`. To use a different domain, set `SITE_URL` when building:
 
 ```sh
 SITE_URL=https://your-domain.com npm run build
@@ -59,7 +59,7 @@ Canonical links and absolute social-image URLs use this public origin, including
 
 Every build generates `sitemap-index.xml` and `sitemap-0.xml` using `@astrojs/sitemap`. The sitemap includes generated pages, including published blog posts; drafts and future-dated posts have no generated routes and are excluded. The shared layout links to the sitemap index, and the generated `robots.txt` advertises its absolute URL using the configured public origin.
 
-After deploying, submit `https://hboutale.ma/sitemap-index.xml` in Google Search Console. If the primary domain changes, submit the same path on that domain instead.
+After deploying, submit `https://hboutale.me/sitemap-index.xml` in Google Search Console. If the primary domain changes, submit the same path on that domain instead.
 
 
 ## Writing a blog post
