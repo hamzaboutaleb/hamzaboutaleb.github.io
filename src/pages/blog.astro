@@ -47,14 +47,14 @@ const posts = await getPublishedPosts();
   .writing-heading h1 { font-size: 1rem; font-weight: 600; line-height: 1.6; letter-spacing: normal; margin: 0; }
   .writing-heading > span { color: var(--muted); font-size: 0.75rem; }
   .post-list { list-style: none; padding: 0; margin: 0; }
-  .post-list > li { border-bottom: 1px solid var(--border); }
-  .post-link { display: block; padding: 26px 16px; text-decoration: none; transition: background-color 180ms ease; }
+  .post-list > li { border-bottom: 1px solid var(--border); transition: background-color 180ms ease; }
+  .post-link { display: block; padding: 26px 16px; text-decoration: none; }
   .post-list > li:has(.post-tags) .post-link { padding-bottom: 14px; }
-  .post-link:is(:hover, :focus-visible) { background: color-mix(in srgb, var(--accent) 6%, var(--background)); }
+  .post-list > li:is(:hover, :focus-within) { background: color-mix(in srgb, var(--accent) 6%, var(--background)); }
   .post-meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.75rem; color: var(--muted); }
   .post-link h2 { display: flex; align-items: baseline; gap: 20px; justify-content: space-between; font-size: 1.25rem; line-height: 1.4; letter-spacing: -0.025em; font-weight: 600; margin: 12px 0 0; }
   .post-link h2 > span { color: var(--accent); flex-shrink: 0; }
-  .post-link:is(:hover, :focus-visible) h2 { color: var(--accent); }
+  .post-list > li:is(:hover, :focus-within) h2 { color: var(--accent); }
   .post-link p { font-size: 0.875rem; line-height: 1.8; margin-top: 10px; max-width: 72ch; }
   .post-tags { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; padding: 0 16px 26px; margin: 0; }
   .post-tags button { padding: 5px 9px; border: 1px solid var(--border); border-radius: 4px; background: transparent; color: var(--muted); font: inherit; font-size: 0.6875rem; line-height: 1.5; cursor: pointer; }
@@ -73,5 +73,5 @@ const posts = await getPublishedPosts();
     .post-tags { padding-inline: 8px; }
     .active-filter { padding-inline: 8px; }
   }
-  @media (prefers-reduced-motion: reduce) { .post-link { transition: none; } }
+  @media (prefers-reduced-motion: reduce) { .post-list > li { transition: none; } }
 </style>
