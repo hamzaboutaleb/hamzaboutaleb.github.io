@@ -1,7 +1,7 @@
 ---
 title: "From HTTP to WebSocket: Building Real-Time Communication"
 description: "From HTTP requests and persistent connections to why we need WebSocket and what it adds."
-pubDate: "2026-10-31"
+pubDate: "2026-11-1"
 draft: false
 ---
 
