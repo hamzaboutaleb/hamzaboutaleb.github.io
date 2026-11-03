@@ -1,8 +1,7 @@
 ---
 title: "Design Patterns in Game Development: What Problems Do They Solve?"
 description: "Exploring game development problems, the design patterns that help solve them, and when to keep things simple."
-pubDate: "2026-11-01"
-draft: false
+pubDate: "2026-11-03"
 tags: ["Game Development", "Design Patterns"]
 ---
 
