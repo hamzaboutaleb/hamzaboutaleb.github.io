@@ -1,7 +1,7 @@
 ---
 title: "Concurrency and Parallelism, Step by Step"
 description: "A simple guide to concurrency and parallelism, the problems they bring, and how locks, atomics, and common patterns help."
-pubDate: "2026-11-04"
+pubDate: "2026-11-05"
 ---
 
 You're buying something online, and the payment is taking a while. While you wait, someone else opens the shop to check a price. Should they have to wait for your payment to finish before the shop can answer?
