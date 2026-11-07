@@ -20,7 +20,7 @@ onPageLoad(scope => {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let activeGallery: Gallery | undefined;
   let activeIndex = 0;
-  let opener: HTMLAnchorElement | undefined;
+  let opener: HTMLElement | undefined;
   let previousOverflow = '';
   scope.onCleanup(() => {
     if (!viewer?.open) return;
@@ -87,6 +87,7 @@ onPageLoad(scope => {
     const count = element.querySelector<HTMLElement>('.gallery-count');
     const prev = element.querySelector<HTMLButtonElement>('[data-gallery-prev]');
     const next = element.querySelector<HTMLButtonElement>('[data-gallery-next]');
+    const enlarge = element.querySelector<HTMLButtonElement>('[data-gallery-enlarge]');
     const dots = Array.from(element.querySelectorAll<HTMLButtonElement>('[data-gallery-index]'));
     if (!track || !slides.length) return;
     let current = 0;
@@ -108,6 +109,22 @@ onPageLoad(scope => {
         track.scrollTo({ left: current * track.clientWidth, behavior: smooth && !reducedMotion.matches ? 'smooth' : 'instant' });
       },
     };
+    const openImage = (index: number, trigger: HTMLElement) => {
+      if (!viewer || !viewerImage || typeof viewer.showModal !== 'function') return;
+      activeGallery = gallery;
+      opener = trigger;
+      previousOverflow = document.documentElement.style.overflow;
+      showImage(index);
+      viewer.showModal();
+      document.documentElement.style.overflow = 'hidden';
+    };
+    if (enlarge && viewer && viewerImage && typeof viewer.showModal === 'function') {
+      enlarge.hidden = false;
+      enlarge.addEventListener('click', () => {
+        const index = Math.round(track.scrollLeft / track.clientWidth);
+        openImage(index, enlarge);
+      });
+    }
     if (controls) controls.hidden = false;
     if (prev) prev.hidden = false;
     if (next) next.hidden = false;
@@ -129,12 +146,7 @@ onPageLoad(scope => {
         if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0) return;
         if (!viewer || !viewerImage || typeof viewer.showModal !== 'function') return;
         event.preventDefault();
-        activeGallery = gallery;
-        opener = slide;
-        previousOverflow = document.documentElement.style.overflow;
-        showImage(index);
-        viewer.showModal();
-        document.documentElement.style.overflow = 'hidden';
+        openImage(index, slide);
       });
     });
     update();

@@ -31,6 +31,18 @@ export const projects: Project[] = [
       'Used PostgreSQL databases per service and Kafka for asynchronous events. Built WebSocket chat and containerized the application with Docker Compose.',
     ],
     technologies: ['Java', 'Spring Boot', 'Angular', 'Kafka', 'PostgreSQL', 'Docker Compose'],
+    images: [
+      { src: '/images/projects/7irafy/01-landing-desktop.png', alt: '7irafy landing page with service categories and an example job', width: 2880, height: 2000 },
+      { src: '/images/projects/7irafy/03-jobs-desktop.png', alt: '7irafy job discovery page and search filters on desktop', width: 2880, height: 2000 },
+      { src: '/images/projects/7irafy/04-job-details-desktop.png', alt: '7irafy job details dialog on desktop', width: 2880, height: 2000 },
+      { src: '/images/projects/7irafy/05-professionals-desktop.png', alt: '7irafy professional directory on desktop', width: 2880, height: 2000 },
+      { src: '/images/projects/7irafy/06-dashboard-desktop.png', alt: '7irafy dashboard with activity and reputation summaries using sample data', width: 2880, height: 2000 },
+      { src: '/images/projects/7irafy/07-messages-desktop.png', alt: '7irafy messaging workspace with a sample conversation on desktop', width: 2880, height: 2000 },
+      { src: '/images/projects/7irafy/08-landing-mobile.png', alt: '7irafy landing page on mobile', width: 780, height: 1688 },
+      { src: '/images/projects/7irafy/09-messages-mobile.png', alt: '7irafy sample conversation and message composer on mobile', width: 780, height: 1688 },
+      { src: '/images/projects/7irafy/10-jobs-mobile.png', alt: '7irafy job discovery page on mobile', width: 780, height: 1688 },
+      { src: '/images/projects/7irafy/02-landing-full-page.png', alt: '7irafy complete landing page', width: 2880, height: 3888 },
+    ],
   },
   {
     name: 'LocalServer',
