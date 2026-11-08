@@ -4,6 +4,7 @@ import { projects, projectCategories } from '../data/projects';
 import { contact } from '../data/contact';
 import ProjectGallery from '../components/ProjectGallery.astro';
 import ProjectImageViewer from '../components/ProjectImageViewer.astro';
+import TechnologyTag from '../components/TechnologyTag.astro';
 ---
 <Layout title="Projects — Hamza Boutaleb" description="Software projects and experiments by Hamza Boutaleb, a software engineer interested in web development and computer systems.">
   <header class="projects-intro">
@@ -28,7 +29,7 @@ import ProjectImageViewer from '../components/ProjectImageViewer.astro';
               <h3>{project.name}</h3>
               <p class="subtitle">{project.subtitle}</p>
               <ul class="technologies" aria-label={`${project.name} technologies`}>
-                {project.technologies.map(technology => <li>{technology}</li>)}
+                {project.technologies.map(technology => <TechnologyTag name={technology} />)}
               </ul>
               {project.sources?.length && (
                 <div class="project-sources">
@@ -85,7 +86,6 @@ import ProjectImageViewer from '../components/ProjectImageViewer.astro';
   .contributions { margin: 0; padding-left: 17px; color: var(--muted); font-size: 0.8125rem; line-height: 1.85; }
   .contributions > li + li { margin-top: 10px; }
   .technologies { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; padding: 0; margin: 18px 0 0; }
-  .technologies > li { padding: 3px 8px; color: var(--muted); border: 1px solid var(--border); border-radius: 4px; font-size: 0.6875rem; line-height: 1.6; }
   .projects-contact { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 40px; }
   .projects-contact p { margin: 0; font-size: 0.9375rem; }
   .projects-contact a { display: inline-flex; gap: 10px; padding-block: 6px; border-bottom: 1px solid transparent; color: var(--accent); font-size: 0.875rem; text-decoration: none; }

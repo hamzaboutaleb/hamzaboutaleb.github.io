@@ -1,0 +1,68 @@
+---
+interface Props { name: string; }
+const { name } = Astro.props;
+const brands: Record<string, { icon: string; color: string }> = {
+  Java: { icon: 'java', color: '#e76f00' },
+  'Spring Boot': { icon: 'spring-boot', color: '#6db33f' },
+  Angular: { icon: 'angular', color: '#dd0031' },
+  Kafka: { icon: 'kafka', color: 'var(--text)' },
+  PostgreSQL: { icon: 'postgresql', color: '#336791' },
+  'Docker Compose': { icon: 'docker-compose', color: '#2496ed' },
+  Rust: { icon: 'rust', color: '#ce8b65' },
+  Go: { icon: 'go', color: '#00add8' },
+  SQLite: { icon: 'sqlite', color: '#388bbd' },
+  Docker: { icon: 'docker-compose', color: '#2496ed' },
+  JavaScript: { icon: 'javascript', color: '#f7df1e' },
+  Python: { icon: 'python', color: '#3776ab' },
+  Flask: { icon: 'flask', color: 'var(--text)' },
+  SQLAlchemy: { icon: 'sqlalchemy', color: '#d71f00' },
+  MySQL: { icon: 'mysql', color: '#4479a1' },
+  jQuery: { icon: 'jquery', color: '#3885b5' },
+  Nginx: { icon: 'nginx', color: '#009639' },
+  Gunicorn: { icon: 'gunicorn', color: '#499848' },
+  React: { icon: 'react', color: '#61dafb' },
+  Django: { icon: 'django', color: '#44b78b' },
+  'TanStack Query': { icon: 'tanstack-query', color: '#ff4154' },
+  Axios: { icon: 'axios', color: '#9b78e6' },
+  'React Router': { icon: 'react-router', color: '#f44250' },
+  'Express.js': { icon: 'express', color: 'var(--text)' },
+  C: { icon: 'c', color: '#659ad2' },
+  'C++98': { icon: 'cpp', color: '#659ad2' },
+  Debian: { icon: 'debian', color: '#d70a53' },
+  Bash: { icon: 'bash', color: '#89b44a' },
+  'Spring Security': { icon: 'shield', color: '#6db33f' },
+  Sockets: { icon: 'network', color: '#4eafbc' },
+  WebSockets: { icon: 'network', color: '#4eafbc' },
+  'TCP/IP': { icon: 'network', color: '#4eafbc' },
+  'Non-blocking I/O': { icon: 'flow', color: '#cf9a4d' },
+  epoll: { icon: 'flow', color: '#cf9a4d' },
+  CGI: { icon: 'terminal', color: '#94a3b8' },
+  Unix: { icon: 'terminal', color: '#94a3b8' },
+  SSH: { icon: 'terminal', color: '#94a3b8' },
+  'x86-64 Assembly': { icon: 'chip', color: '#a18bd1' },
+  Assembly: { icon: 'chip', color: '#a18bd1' },
+  HDL: { icon: 'chip', color: '#a18bd1' },
+  'Computer Architecture': { icon: 'chip', color: '#a18bd1' },
+  'Compiler Design': { icon: 'flow', color: '#a18bd1' },
+  'Breadth-First Search': { icon: 'graph', color: '#43b5a0' },
+  'Graph Algorithms': { icon: 'graph', color: '#43b5a0' },
+  LVM: { icon: 'storage', color: '#d39a54' },
+  UFW: { icon: 'shield', color: '#df8656' },
+  AppArmor: { icon: 'shield', color: '#df8656' },
+  Cron: { icon: 'clock', color: '#7baa65' },
+  MiniLibX: { icon: 'display', color: '#cc80a9' },
+  'Ray Tracing': { icon: 'display', color: '#cc80a9' },
+  'Vector Mathematics': { icon: 'vector', color: '#c597d9' },
+};
+const brand = brands[name];
+---
+<li class:list={['technology-tag', { branded: brand }]} style={brand && `--brand: ${brand.color}`}>
+  {brand && <span class="technology-icon" style={`--icon: url('/images/technologies/${brand.icon}.svg')`} aria-hidden="true"></span>}
+  {name}
+</li>
+
+<style>
+  .technology-tag { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; color: var(--muted); border: 1px solid var(--border); border-radius: 5px; font-size: 0.6875rem; line-height: 1.6; white-space: nowrap; }
+  .technology-tag.branded { color: var(--text); border-color: color-mix(in srgb, var(--brand) 32%, var(--background)); background: color-mix(in srgb, var(--brand) 8%, var(--background)); }
+  .technology-icon { flex-shrink: 0; width: 14px; height: 14px; background: color-mix(in srgb, var(--brand) 80%, var(--text)); mask: var(--icon) center / contain no-repeat; }
+</style>
