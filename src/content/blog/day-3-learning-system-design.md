@@ -23,8 +23,6 @@ For the report system, A could be the scheduler that assigns jobs to workers. If
 
 The normal case and a replacement election look like this:
 
-<!-- [Diagram: Two notebook-style panels with servers A, B, and C. First, A is labeled “Scheduler leader” and sends job assignments to B and C; second, A is unreachable and B becomes the replacement after the election protocol succeeds. Add “Timeout means suspected failure” beside A, without claiming A is certainly dead. Alt: A leader assigns work, and a replacement takes over through an election when the previous leader becomes unreachable.] -->
-
 ![A leader assigns work, and a replacement takes over through an election when the previous leader becomes unreachable.](/images/blog/system-design-day-3/leader-election-notebook.webp)
 
 A former leader may still believe it is in charge after a pause or network failure. The system must prevent outdated leaders from making conflicting changes. Choosing a leader alone doesn't make every later operation safe.
@@ -43,7 +41,6 @@ Workers request the same lock from a shared coordination service. The owner proc
 
 For example, A acquires `report:daily` while B waits:
 
-<!-- [Diagram: Servers A and B request the named lock “report:daily” from a coordination service. Show A granted ownership and writing the report, while B waits; after A releases, B may acquire it. Keep the lock service separate from report storage. Alt: Two workers share one lock service so only the current owner is allowed to update the report.] -->
 
 ![Two workers share one lock service so only the current owner is allowed to update the report.](/images/blog/system-design-day-3/pessimistic-locking-notebook.webp)
 
@@ -64,7 +61,6 @@ B doesn't silently overwrite A's work. It must read the new state before decidin
 
 The two save attempts have different outcomes:
 
-<!-- [Diagram: Three numbered stages show both workers reading version 3, A saving successfully to version 4, and B being rejected because its expected version is still 3. Alt: A saves first and advances the version to four; B cannot overwrite it using version three.] -->
 
 ![A saves first and advances the version to four; B cannot overwrite it using version three.](/images/blog/system-design-day-3/optimistic-locking-notebook.webp)
 
@@ -80,7 +76,6 @@ One approach uses a registry. Instances register their addresses, and clients or
 
 A report scheduler might look up `report-worker` instead of keeping worker addresses in its code:
 
-<!-- [Diagram: A scheduler asks a service registry for “report-worker” and receives addresses for workers B and C. In a second frame, B's registration expires and the registry returns only C; mark “A returned address can still fail.” Alt: A registry lets the scheduler discover workers without hard-coding their addresses.] -->
 
 ![A registry lets the scheduler discover workers without hard-coding their addresses.](/images/blog/system-design-day-3/service-discovery-notebook.webp)
 
@@ -115,7 +110,6 @@ The scheduler reads these records to find workers. A worker can create a tempora
 
 The registration tree changes after the session expires:
 
-<!-- [Diagram: Two matching directory-style trees show workers B and C registered under /report-workers, then only C remaining after B session expiration. A scheduler reads each tree. Alt: ZooKeeper removes worker B’s temporary registration after its session expires, leaving worker C registered.] -->
 
 ![ZooKeeper removes worker B’s temporary registration after its session expires, leaving worker C registered.](/images/blog/system-design-day-3/zookeeper-registration-notebook.webp)
 
@@ -135,8 +129,6 @@ Value: scheduler-a
 Each asks etcd to create the key only if it doesn't already exist. etcd checks that condition and performs the write together, so only one claim succeeds. A separate read followed by an unconditional write wouldn't provide the same protection.
 
 Only the first conditional claim succeeds:
-
-<!-- [Diagram: Three stages show an absent owner key, scheduler A creating it conditionally, and scheduler B failing the same condition because the key now exists. The stored value remains scheduler-a. Alt: etcd accepts scheduler A’s conditional claim and rejects scheduler B’s attempt without changing the owner.] -->
 
 ![etcd accepts scheduler A’s conditional claim and rejects scheduler B’s attempt without changing the owner.](/images/blog/system-design-day-3/etcd-ownership-notebook.webp)
 
